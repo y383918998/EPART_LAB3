@@ -1,9 +1,9 @@
-function clab = groupvoting(tset, clsmx)
-% Simple unanimity voting function 
+function clab = OVRvoting(tset, clsmx)
+% Simple unanimity voting function
 % 	tset - matrix containing test data; one row represents one sample
 % 	clsmx - voting committee matrix
 % Output:
-%	clab - classification result 
+%	clab - classification result
 
     % class processing
 	labels = unique(clsmx(:, 1));

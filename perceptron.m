@@ -8,49 +8,44 @@ function [sepplane mispos misneg] = perceptron(pclass, nclass)
 % mispos - number of misclassified samples of pclass
 % misneg - number of misclassified samples of nclass
 
-  % training data aggregation and denormalization (of the neg class)
+  % initial random solution
   sepplane = rand(1, columns(pclass) + 1) - 0.5;
+
+  % training data aggregation and denormalization (of the neg class)
   tset = [ ones(rows(pclass), 1) pclass; -ones(rows(nclass), 1) -nclass];
+
   nPos = rows(pclass); % number of positive samples
   nNeg = rows(nclass); % number of negative samples
 
   i = 1;
-  do 
-    %%% YOUR CODE GOES HERE %%%
-    %% You should:
-    %% 1. Check which samples are misclassified (boolean column vector)
-    misclassified = tset * sepplane' <0;
+  do
+	%%% YOUR CODE GOES HERE %%%
+	%% You should:
+	%% 1. Check which samples are misclassified (boolean column vector)
+	misclassified = (tset * sepplane') < 0;
 
-    %% 2. Compute separating plane correction 
-    %%		This is sum of misclassfied samples coordinate times learning rate
-    correction = sum(tset(misclassified,:), 1);
+	%% 2. Compute separating plane correction
+	%%		This is sum of misclassfied samples coordinate times learning rate
+	correction = sum(tset(misclassified, :), 1);
 
+	%% 3. Modify solution (i.e. sepplane)
+	sepplane = sepplane + correction;
 
-    %% 3. Modify solution (i.e. sepplane)
-    sepplane = sepplane + correction;
+	%% 4. Optionally you can include additional conditions to the stop criterion
+	if ~any(misclassified)
+	  break
+	end
 
+	%%		200 iterations can take a while and probably in most cases is unnecessary
 
-    %% 4. Optionally you can include additional conditions to the stop criterion
-    splen = sqrt(sumsq(sepplane));
-	corlen = sqrt(sumsq(correction));
-	if corlen < 0.001 * splen
-      i
-      break
-    end
-
-
-    res = tset * sepplane';
-    misclass = res<0;
-    sepplane = sepplane + sqrt(1/i)*sum(tset(misclass,:));%sqrt(1/i)
-    
-    %%		200 iterations can take a while and probably in most cases is unnecessary
-
-    ++i;
-  until i > 100;
+	++i;
+  until i > 200;
 
   %%% YOUR CODE GOES HERE %%%
   %% You should:
   %% 1. Compute the numbers of false positives and false negatives
-  mispos = sum(misclassified(1:nPos));
-  misneg = sum(misclassified(nPos+1:end));
+  final_misclassified = (tset * sepplane') < 0;
+  mispos = sum(final_misclassified(1:nPos));
+  misneg = sum(final_misclassified(nPos+1:end));
 end
+
